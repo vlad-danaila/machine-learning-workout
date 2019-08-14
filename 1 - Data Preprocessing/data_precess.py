@@ -30,3 +30,9 @@ x = np.delete(x, 0, axis = 1)
 
 # Split test - train
 x_train, x_test, y_train, y_test = split.train_test_split(x, y, test_size = 0.3)
+
+# Scaling
+scaler = prepross.StandardScaler()
+x_train[:, 2:] = scaler.fit_transform(x_train[:, 2:])
+x_test[:, 2:] = scaler.transform(x_test[:, 2:])
+
