@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 import sklearn as sk
 import sklearn.preprocessing as prepross
-import sklearn.cross_decomposition
 import sklearn.model_selection._split as split
 
 dataset = pd.read_csv('C:\DOC\Workspace\Machine Learning A-Z Template Folder\Part 1 - Data Preprocessing\Data.csv')
