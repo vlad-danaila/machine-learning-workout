@@ -16,10 +16,12 @@ make_factors = function(features) {
 dataset$Country = make_factors(dataset$Country)
 dataset$Purchased = factor(dataset$Purchased, levels = c('No', 'Yes'), labels = c(0, 1))
 
+# Feature scaling
+dataset[, 2:3] = scale(dataset[, 2:3])
+
 # Split
 #install.packages('caTools')
 library('caTools')
 dataset_split = sample.split(dataset$Purchased, SplitRatio = 0.7)
 train = subset(dataset, dataset_split)
 test = subset(dataset, !dataset_split)
-
