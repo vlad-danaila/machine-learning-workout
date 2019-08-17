@@ -34,3 +34,13 @@ x_test[:, 2:5] = scaler.transform(x_test[:, 2:5])
 ols = sm.OLS(endog = y_train, exog = x_train).fit()
 ols.summary()
 
+# Step 2
+sm.OLS(endog = y_train, exog = x_train[:, :-1]).fit().summary()
+
+# Step 3
+sm.OLS(endog = y_train, exog = x_train[:, :-2]).fit().summary()
+
+# Step 4
+sm.OLS(endog = y_train, exog = x_train[:, :-3]).fit().summary()
+
+# Version in step 3 has best adjusted R-Squared so we will keep variables 0, 1, 2
