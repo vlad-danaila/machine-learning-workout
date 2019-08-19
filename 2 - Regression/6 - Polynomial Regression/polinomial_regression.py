@@ -21,7 +21,7 @@ x = np.expand_dims(x, axis = 1)
 y = np.expand_dims(y, axis = 1)
 
 # Polinomial features
-ploy = sk.preprocessing.PolynomialFeatures(degree = 2)
+ploy = sk.preprocessing.PolynomialFeatures(degree = 5)
 x_poly = ploy.fit_transform(x)
 
 # Linear regression
@@ -29,6 +29,11 @@ regressor = sk.linear_model.LinearRegression()
 regressor.fit(x_poly, y)
 predicitons = regressor.predict(x_poly)
 
-plt.scatter(x, y)
-plt.plot(x, predicitons)
+# Plots
+x_plot = np.arange(x[0], x[-1], step = 0.0001)
+x_plot = np.expand_dims(x_plot, 1)
+predictions_plot = regressor.predict(ploy.fit_transform(x_plot))
+
+plt.plot(x_plot, predictions_plot)
+plt.scatter(x, y, color = 'red')
 plt.show()
