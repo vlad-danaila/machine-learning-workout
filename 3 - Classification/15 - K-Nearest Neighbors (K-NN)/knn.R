@@ -7,9 +7,18 @@ library(caTools)
 # Load data
 data = read.csv('C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 3 - Classification/Section 15 - K-Nearest Neighbors (K-NN)/Social_Network_Ads.csv')
 data = data[3:5]
-dataset$Purchased = factor(dataset$Purchased, levels = c(0, 1))
 
-data[1:2] = scale(data[1:2])
+# Feature scaling
+means = apply(data[1:2], 2, mean)
+stds = apply(data[1:2], 2, sd)
+feature_scaling = function(arrays, means, stds) {
+  for (i in 1: length(arrays)) {
+    arrays[i] = arrays[i] - means[i]
+    arrays[i] = arrays[i] / stds[i]
+  }
+  arrays
+}
+data[1:2] = feature_scaling(data[1:2], means, stds)
 
 # Train - test split
 is_train = sample.split(data$Purchased, SplitRatio = 0.7)
@@ -47,5 +56,5 @@ plot(
   ylab = 'Sallary',
   xlim = range(grid_x_0),
   ylim = range(grid_x_1))
-points(grid_x_0_1[, 1], grid_x_0_1[, 2], pch = 16, col = ifelse(grid_pred == 1, 'tomato', 'springgreen'), alpha = 0.2)
+points(grid_x_0_1[, 1], grid_x_0_1[, 2], pch = 16, col = ifelse(grid_pred == 1, 'tomato', 'springgreen'))
 points(data_test$Age, data_test$EstimatedSalary, pch = 16, col = ifelse(data_test$Purchased, 'darkred', 'darkgreen'))
