@@ -16,12 +16,17 @@ x, y = data.iloc[:, 2:-1].values, data.iloc[:, -1].values
 # Train test split
 x_train, x_test, y_train, y_test = sklearn.model_selection._split.train_test_split(x, y, train_size = 0.7)
 
+# Feature scaling - it is necessary for KNN !
+scaler = sklearn.preprocessing.StandardScaler()
+x_train_scaled = scaler.fit_transform(x_train)
+x_test_scaled = scaler.transform(x_test)
+
 # KNN clasificatioin
-knn = sklearn.neighbors.KNeighborsClassifier(n_neighbors = 5, p = 2)
-knn.fit(x_train, y_train)
+knn = sklearn.neighbors.KNeighborsClassifier(n_neighbors = 15, weights = 'distance', p = 2)
+knn.fit(x_train_scaled, y_train)
 
 # Predictions test-set
-y_pred = knn.predict(x_test)
+y_pred = knn.predict(x_test_scaled)
 
 # Confusion matrix & accuracy
 cm = sklearn.metrics.confusion_matrix(y_test, y_pred)
@@ -29,7 +34,7 @@ accuracy = np.sum(np.diag(cm)) / np.sum(cm)
 print('Accuracy is', accuracy)
 
 # Making grid for plot
-def get_grid(x, n_steps = 1000):
+def get_grid(x, n_steps = 100):
     x_min_limit, x_max_limit = x.min() - 1, x.max() + 1
     x_step = (x_max_limit - x_min_limit) / n_steps
     x_grid = np.arange(x_min_limit, x_max_limit, x_step)
@@ -39,7 +44,8 @@ x_0_grid = get_grid(x[:, 0])
 x_1_grid = get_grid(x[:, 1])
 x_0_mesh, x_1_mesh = np.meshgrid(x_0_grid, x_1_grid)
 x_0_1_grid = np.array([x_0_mesh.ravel(), x_1_mesh.ravel()]).T
-y_pred_grid = knn.predict(x_0_1_grid).reshape(x_0_mesh.shape)
+x_0_1_grid_scaled = scaler.transform(x_0_1_grid)
+y_pred_grid = knn.predict(x_0_1_grid_scaled).reshape(x_0_mesh.shape)
 
 # Display plot
 plt.contourf(x_0_grid, x_1_grid, y_pred_grid, alpha = 0.2, cmap = matplotlib.colors.ListedColormap(('green', 'red')))
