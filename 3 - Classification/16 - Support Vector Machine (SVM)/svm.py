@@ -27,22 +27,22 @@ y_pred = svm.predict(x_test)
 
 # Make grid for plotting
 def make_grid(v, steps = 100):
-    v_min_limit = v.min() - 0.5
-    v_max_limit = v.max() + 0.5
+    v_min_limit, v_max_limit = v.min() - 0.5, v.max() + 0.5
     step_len = (v_max_limit - v_min_limit) / steps
     return np.arange(v_min_limit, v_max_limit, step_len)
 
-x_0_grid = make_grid(x_test[:, 0])
-x_1_grid = make_grid(x_test[:, 1])
+x_0_grid, x_1_grid = make_grid(x_test[:, 0]), make_grid(x_test[:, 1]) 
 x_0_mesh, x_1_mesh = np.meshgrid(x_0_grid, x_1_grid)
 x_0_1_grid = np.array([x_0_mesh.ravel(), x_1_mesh.ravel()]).T
 y_grid = svm.predict(x_0_1_grid)
-
-# Unscale features
 y_grid = y_grid.reshape(x_0_mesh.shape)
 
+# Unscale features
+x_test = scaler.inverse_transform(x_test)
+x_0_grid, x_1_grid = make_grid(x_test[:, 0]), make_grid(x_test[:, 1])
+
 # Display plot
-plt.contourf(x_0_mesh, x_1_mesh, y_grid, cmap = matplotlib.colors.ListedColormap(('red', 'green')), alpha = 0.2)
+plt.contourf(x_0_grid, x_1_grid, y_grid, cmap = matplotlib.colors.ListedColormap(('red', 'green')), alpha = 0.2)
 plt.scatter(x_test[y_test == 1, 0], x_test[y_test == 1, 1], color = 'green')
 plt.scatter(x_test[y_test == 0, 0], x_test[y_test == 0, 1], color = 'red')
 plt.show()
