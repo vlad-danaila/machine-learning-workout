@@ -8,9 +8,14 @@ library(caTools)
 data = read.csv('C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 3 - Classification/Section 15 - K-Nearest Neighbors (K-NN)/Social_Network_Ads.csv')
 data = data[3:5]
 
+# Train - test split
+is_train = sample.split(data$Purchased, SplitRatio = 0.7)
+data_train = subset(data, is_train)
+data_test = subset(data, !is_train)
+
 # Feature scaling
-means = apply(data[1:2], 2, mean)
-stds = apply(data[1:2], 2, sd)
+means = apply(data_train[1:2], 2, mean)
+stds = apply(data_train[1:2], 2, sd)
 feature_scaling = function(arrays, means, stds) {
   for (i in 1: length(arrays)) {
     arrays[i] = arrays[i] - means[i]
@@ -18,16 +23,14 @@ feature_scaling = function(arrays, means, stds) {
   }
   arrays
 }
-data[1:2] = feature_scaling(data[1:2], means, stds)
-
-# Train - test split
-is_train = sample.split(data$Purchased, SplitRatio = 0.7)
-data_train = subset(data, is_train)
-data_test = subset(data, !is_train)
+data_train_scale = data.frame(data_train)
+data_train_scale[1:2] = feature_scaling(data_train_scale[1:2], means, stds)
+data_test_scale = data.frame(data_test)
+data_test_scale[1:2] = feature_scaling(data_test_scale[1:2], means, stds)
 
 # KNN classification on test set
 pred_test = knn(
-  train = data_train[-3], test = data_test[-3], cl = data_train$Purchased, k = 5)
+  train = data_train_scale[-3], test = data_test_scale[-3], cl = data_train_scale$Purchased, k = 5)
 
 # Confusion matrix
 cm = table(data_test$Purchased, pred_test)
@@ -44,8 +47,9 @@ grid_x_0 = make_grid(data_test$Age)
 grid_x_1 = make_grid(data_test$EstimatedSalary)
 grid_x_0_1 = expand.grid(grid_x_0, grid_x_1)
 colnames(grid_x_0_1) = colnames(data[-3])
+grid_x_0_1_scale = feature_scaling(grid_x_0_1, means, stds)
 grid_pred = knn(
-  train = data_train[-3], test = grid_x_0_1, cl = data_train$Purchased, k = 15)
+  train = data_train_scale[-3], test = grid_x_0_1_scale, cl = data_train_scale$Purchased, k = 15)
 
 # Display plot
 plot(
