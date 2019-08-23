@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import math
 import numpy as np
 import sklearn.preprocessing
 import sklearn as sk
@@ -28,16 +29,33 @@ subplots[0].set_title('Within cluster sum of squares')
 subplots[0].set_xlabel('Nr. Clusters')
 subplots[0].set_ylabel('WCSS')
 
+# Find the best nr of clusters
+slope = np.gradient(wcss)
+curvature = np.gradient(slope)
+torsion = np.gradient(curvature)
+torsion_abs = np.abs(torsion)
+nr_clusters = np.where(torsion_abs == torsion_abs.max())[0][0] + 2
+print('The best number of clusters is', nr_clusters)
+subplots[0].scatter(nr_clusters, wcss[nr_clusters - 2], color = 'red', s = 100)
+
 # Cluster
-nr_clusters = 5
 k_means = sk.cluster.KMeans(n_clusters = nr_clusters)
 x_clustered = k_means.fit_predict(x)
 
 # Plot clusters
-for _class, color in enumerate(('red', 'green', 'blue', 'yellow', 'orange')):
-    is_class = x_clustered == _class
-    subplots[1].scatter(x[is_class, 0], x[is_class, 1], color = color)
+colors = ('red', 'green', 'blue', 'yellow', 'pink', 'orange')
+
+def get_color(i):
+    return colors[i % len(colors)]
+
+for i in range(nr_clusters):
+    is_class = x_clustered == i
+    subplots[1].scatter(x[is_class, 0], x[is_class, 1], color = get_color(i))
+centroids = k_means.cluster_centers_
+subplots[1].scatter(centroids[:, 0], centroids[:, 1], color = 'black', s = 150)
 subplots[1].set_title('Clusters')
 subplots[1].set_xlabel('Inconme')
 subplots[1].set_ylabel('Spending Score')
 plt.show()
+
+
