@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
-import math
 import numpy as np
 import pandas as pd
 
-support_treshold = 0.003
-confidence_treshold = 0.2
-lift_treshold = 3
+MIN_SUPPORT = 0.01
+MIN_CONFIDENCE = 0.2
+MIN_LIFT = 3
 
-data_path = 'C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 5 - Association Rule Learning/Section 28 - Apriori/Market_Basket_Optimisation.csv'
-data = pd.read_csv(data_path, header = None)
+DATA_PATH = 'C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 5 - Association Rule Learning/Section 28 - Apriori/Market_Basket_Optimisation.csv'
+data = pd.read_csv(DATA_PATH, header = None)
 
 '''
 1. Initialize a map for support
@@ -22,41 +21,47 @@ data = pd.read_csv(data_path, header = None)
 8. Sort by lift
 '''
 
-# Count elements
-count_elems = {}
-for i, elems in data.iterrows():
-    for e in elems:
-        if type(e) is str:
-            if e in count_elems.keys():
-                count_elems[e] += 1
+# transactions variable will keep the fitered and cleaned up data
+transactions = []
+
+# Count elements for calculating support
+products_count = {}
+for i, row in data.iterrows(): # for each transaction
+    transaction = set()
+    for product in row: # for each product in the transaction
+        if type(product) is str: # if valid product
+            transaction.add(product)
+            if product in products_count: # do the counting
+                products_count[product] += 1
             else:
-                count_elems[e] = 1
+                products_count[product] = 1
+    transactions.append(transaction)        
 
 # Calculate support
 total = len(data)
-support = { key : (value / total) for key, value in count_elems.items() if (value / total) > support_treshold }
+products_support = { k : v / total for k, v in products_count.items() if v / total > MIN_SUPPORT }
 
 # Count combinations
-comb_elems = {}
-for support_elem in support.keys():
-    for i, elems in data.iterrows():
-        if support_elem in set(elems):
-            combinations = [ (support_elem, e) for e in elems if type(e) is str and e != support_elem ]    
-            for comb in combinations:
-                if comb in comb_elems.keys():
-                    comb_elems[comb] += 1
-                else:
-                    comb_elems[comb] = 1
+prod_pair_count = {}
+for main_product in products_support.keys(): # iterate through products that have a support higher then treshold
+    for transaction in transactions: # iterate through the transactions
+        if main_product in transaction: 
+            for product in transaction:
+                if product in products_support and product != main_product:
+                    product_pair = main_product, product
+                    if product_pair in prod_pair_count:
+                        prod_pair_count[product_pair] += 1
+                    else:
+                        prod_pair_count[product_pair] = 1
+
 
 # Calculate confidence
-confidence = { products : (count / count_elems[products[1]]) for products, count in comb_elems.items() 
-    if (count / count_elems[products[1]]) > confidence_treshold 
-        and products[1] in support 
-        and support[products[1]] > support_treshold 
+confidence = { products : (count / products_count[products[1]]) for products, count in prod_pair_count.items() 
+    if (count / products_count[products[1]]) > MIN_CONFIDENCE 
 }
 
 # Calculate lift
-lift = { products : (conf / support[products[0]]) for products, conf in confidence.items() 
-    if (conf / support[products[0]]) > lift_treshold and support[products[0]] > support_treshold }
+lift = { products : (conf / products_support[products[0]]) for products, conf in confidence.items() 
+    if (conf / products_support[products[0]]) > MIN_LIFT and products_support[products[0]] > MIN_SUPPORT }
 
 sorted_lifts = sorted(lift.items(), key = lambda elem: elem[1], reverse = True)
