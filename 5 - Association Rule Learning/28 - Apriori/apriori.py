@@ -11,14 +11,10 @@ DATA_PATH = 'C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 5 - Asso
 data = pd.read_csv(DATA_PATH, header = None)
 
 '''
-1. Initialize a map for support
-2. Iterate through the dataset, calculate support for each element and store in map.
-3. Keep only a part of elements with support higher then x
-4. For those elements, calculate confidence 
-5. Filter by confidence treshold
-6. Calculate lift
-7. Filter by lift trehold
-8. Sort by lift
+1. Count the elements in order to calculate support
+2. Count product pairs in order to calculate confidence
+3. Once we have the confidence and support calculate the lift
+4. Sort according to lift and display results
 '''
 
 # transactions variable will keep the fitered and cleaned up data
@@ -26,12 +22,15 @@ transactions = []
 
 # Count elements for calculating support
 products_count = {}
-for i, row in data.iterrows(): # for each transaction
+# For each transaction
+for i, row in data.iterrows(): 
     transaction = set()
-    for product in row: # for each product in the transaction
-        if type(product) is str: # if valid product
+    # For each product in the transaction
+    for product in row: 
+        # If valid product
+        if type(product) is str: 
             transaction.add(product)
-            if product in products_count: # do the counting
+            if product in products_count: 
                 products_count[product] += 1
             else:
                 products_count[product] = 1
@@ -41,12 +40,14 @@ for i, row in data.iterrows(): # for each transaction
 total = len(data)
 products_support = { k : v / total for k, v in products_count.items() if v / total > MIN_SUPPORT }
 
-# Count combinations
+# Count pairs of products
 prod_pair_count = {}
-for main_product in products_support.keys(): # iterate through products that have a support higher then treshold
-    for transaction in transactions: # iterate through the transactions
+# Iterate through products that have a support higher then treshold
+for main_product in products_support.keys(): 
+    # Iterate through the transactions
+    for transaction in transactions: 
         if main_product in transaction: 
-            for product in transaction:
+            for product in transaction: 
                 if product in products_support and product != main_product:
                     product_pair = main_product, product
                     if product_pair in prod_pair_count:
@@ -55,13 +56,19 @@ for main_product in products_support.keys(): # iterate through products that hav
                         prod_pair_count[product_pair] = 1
 
 
-# Calculate confidence
-confidence = { products : (count / products_count[products[1]]) for products, count in prod_pair_count.items() 
-    if (count / products_count[products[1]]) > MIN_CONFIDENCE 
-}
+# Calculate confidence & lift
+products_confidence = {}
+lifts = []
+for product_pair, count in prod_pair_count.items():
+    product_1, product_2 = product_pair
+    confidence = count / products_count[product_2]
+    if confidence > MIN_CONFIDENCE:
+        lift = confidence / products_support[product_1]    
+        if lift > MIN_LIFT:
+            lifts.append((product_pair, lift))
 
-# Calculate lift
-lift = { products : (conf / products_support[products[0]]) for products, conf in confidence.items() 
-    if (conf / products_support[products[0]]) > MIN_LIFT and products_support[products[0]] > MIN_SUPPORT }
+# Sort by lift
+lifts.sort(key = lambda lift_tuple: lift_tuple[1], reverse = True) 
 
-sorted_lifts = sorted(lift.items(), key = lambda elem: elem[1], reverse = True)
+print('Results:')
+print(*lifts, sep = '\n')
