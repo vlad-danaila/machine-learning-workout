@@ -4,7 +4,7 @@ import math
 import numpy as np
 import pandas as pd
 
-support_treshold = 0.003
+support_treshold = 0.01
 confidence_treshold = 0.2
 lift_treshold = 3
 
@@ -49,7 +49,7 @@ for support_elem in support.keys():
                     comb_elems[comb] = 1
 
 # Calculate confidence
-confidence = { products : (count / count_elems[products[0]]) for products, count in comb_elems.items() 
+confidence = { products : (count / count_elems[products[1]]) for products, count in comb_elems.items() 
     if (count / count_elems[products[1]]) >= confidence_treshold }
 
 # Calculate lift
