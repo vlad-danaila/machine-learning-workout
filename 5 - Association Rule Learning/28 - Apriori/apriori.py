@@ -4,7 +4,9 @@ import math
 import numpy as np
 import pandas as pd
 
-support_treshold = 0.1
+support_treshold = 0.003
+confidence_treshold = 0.2
+lift_treshold = 3
 
 data_path = 'C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 5 - Association Rule Learning/Section 28 - Apriori/Market_Basket_Optimisation.csv'
 data = pd.read_csv(data_path, header = None)
@@ -39,11 +41,19 @@ comb_elems = {}
 for support_elem in support.keys():
     for i, elems in data.iterrows():
         if support_elem in set(elems):
-            combinations = [ frozenset((support_elem, e)) for e in elems if type(e) is str and e != support_elem ]    
+            combinations = [ (support_elem, e) for e in elems if type(e) is str and e != support_elem ]    
             for comb in combinations:
                 if comb in comb_elems.keys():
                     comb_elems[comb] += 1
                 else:
                     comb_elems[comb] = 1
 
+# Calculate confidence
+confidence = { products : (count / count_elems[products[0]]) for products, count in comb_elems.items() 
+    if (count / count_elems[products[1]]) >= confidence_treshold }
 
+# Calculate lift
+lift = { products : (conf / support[products[0]]) for products, conf in confidence.items() 
+    if (conf / support[products[0]]) > lift_treshold }
+
+sorted_lifts = sorted(lift.items(), key = lambda elem: elem[1], reverse = True)
