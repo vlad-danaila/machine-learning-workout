@@ -4,7 +4,7 @@ import math
 import numpy as np
 import pandas as pd
 
-support_treshold = 0.01
+support_treshold = 0.003
 confidence_treshold = 0.2
 lift_treshold = 3
 
@@ -34,7 +34,7 @@ for i, elems in data.iterrows():
 
 # Calculate support
 total = len(data)
-support = { key : (value / total) for key, value in count_elems.items() if (value / total) >= support_treshold }
+support = { key : (value / total) for key, value in count_elems.items() if (value / total) > support_treshold }
 
 # Count combinations
 comb_elems = {}
@@ -50,10 +50,13 @@ for support_elem in support.keys():
 
 # Calculate confidence
 confidence = { products : (count / count_elems[products[1]]) for products, count in comb_elems.items() 
-    if (count / count_elems[products[1]]) >= confidence_treshold }
+    if (count / count_elems[products[1]]) > confidence_treshold 
+        and products[1] in support 
+        and support[products[1]] > support_treshold 
+}
 
 # Calculate lift
 lift = { products : (conf / support[products[0]]) for products, conf in confidence.items() 
-    if (conf / support[products[0]]) > lift_treshold }
+    if (conf / support[products[0]]) > lift_treshold and support[products[0]] > support_treshold }
 
 sorted_lifts = sorted(lift.items(), key = lambda elem: elem[1], reverse = True)
