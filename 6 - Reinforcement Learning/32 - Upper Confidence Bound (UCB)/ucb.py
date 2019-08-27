@@ -15,7 +15,7 @@ data = pd.read_csv('C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 6
 ads = data.iloc[:].values
 
 N = len(ads[0])
-counts, rewards = np.zeros(N), np.zeros(N)
+counts, rewards, upper_bounds = np.zeros(N), np.zeros(N), np.full((N), np.Infinity)
 
 for ad in ads:
     print(ad)
