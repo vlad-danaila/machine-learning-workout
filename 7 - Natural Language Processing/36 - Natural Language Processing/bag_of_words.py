@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sklearn.model_selection._split
 import sklearn.naive_bayes
+import sklearn.feature_extraction.text
 import nltk
 import nltk.stem.porter
 import nltk.corpus
@@ -26,4 +27,7 @@ def transform_review_text(text):
     return ' '.join(text_array)
     
 x = [transform_review_text(review) for review in x]
+
+vectorizer = sklearn.feature_extraction.text.CountVectorizer(max_features = 1500)
+x = vectorizer.fit_transform(x).toarray()
 
