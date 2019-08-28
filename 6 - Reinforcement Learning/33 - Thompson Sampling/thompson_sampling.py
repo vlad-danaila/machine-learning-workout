@@ -21,12 +21,10 @@ data = data.iloc[:].values
 N = len(data[0])
 ads_selected = []
 ads_count = [np.ones(N), np.ones(N)]
-sample_values = []
 
 for cliked in data:
     samples = np.array([random.betavariate(ads_count[1][i], ads_count[0][i]) for i in range(N)])
     sample = np.argmax(samples)
-    sample_values.append(max(samples))
     ads_selected.append(sample)
     ads_count[cliked[sample]][sample] += 1 
     
