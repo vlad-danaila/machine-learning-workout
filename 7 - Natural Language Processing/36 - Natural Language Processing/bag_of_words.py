@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import sklearn.model_selection._split
 import sklearn.naive_bayes
 import sklearn.feature_extraction.text
+import sklearn.metrics
 import nltk
 import nltk.stem.porter
 import nltk.corpus
@@ -28,6 +29,15 @@ def transform_review_text(text):
     
 x = [transform_review_text(review) for review in x]
 
-vectorizer = sklearn.feature_extraction.text.CountVectorizer(max_features = 1500)
-x = vectorizer.fit_transform(x).toarray()
+x_train, x_test, y_train, y_test = sklearn.model_selection._split.train_test_split(x, y, train_size=0.8)
 
+vectorizer = sklearn.feature_extraction.text.CountVectorizer(max_features = 1500)
+x_train_vectorized = vectorizer.fit_transform(x_train).toarray()
+
+classifier = sklearn.naive_bayes.GaussianNB()
+
+classifier.fit(x_train_vectorized, y_train)
+
+y_pred = classifier.predict(vectorizer.transform(x_test).toarray())
+
+confusion_matrix = sklearn.metrics.confusion_matrix(y_test, y_pred)
