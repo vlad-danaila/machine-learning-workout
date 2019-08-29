@@ -14,7 +14,7 @@ data = pd.read_csv('C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 8
 
 x, y = data.iloc[:, 3:-1].values, data.iloc[:, -1].values
 
-x_train, x_test, y_train, y_test = sk.model_selection._split.train_test_split(x, y, train_size = .5)
+x_train, x_test, y_train, y_test = sk.model_selection._split.train_test_split(x, y, train_size = .8, shuffle = False)
 
 # Prepare scaler
 scaled_columns = [0, 3, 4, 5, 6, 9]
@@ -45,7 +45,7 @@ model = ks.models.Sequential((
 
 # Train model
 model.compile('adam', loss = ks.losses.binary_crossentropy, metrics = ['accuracy'])
-model.fit(x_train, y_train, batch_size = 32, epochs = 3, validation_split = 0.3)
+model.fit(x_train, y_train, batch_size = 32, epochs = 10, validation_split = 0.3)
 
 # Make predictions
 y_pred = model.predict(x_test)
