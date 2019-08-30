@@ -35,22 +35,22 @@ array([[4., 4.],
 '''
 
 # eigen values & vectors
-values, vectors = eig(C)
+eigen_vals, eigen_vect = eig(C)
 '''
-values
+eigen_vals
 array([8., 0.])
 
-vectors
+eigen_vect
 array([[ 0.70710678, -0.70710678],
        [ 0.70710678,  0.70710678]])
 
-vectors.T
+eigen_vect.T
 array([[ 0.70710678,  0.70710678],
        [-0.70710678,  0.70710678]])
 '''
 
 # transform data
-P = vectors.T.dot(M_centered)
+PCA_projection = eigen_vect.T.dot(M_centered)
 ''' 
 array([[-2.82842712,  0.        ,  2.82842712],
        [ 0.        ,  0.        ,  0.        ]])
