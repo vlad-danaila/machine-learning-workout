@@ -33,15 +33,11 @@ validation_generator = test_datagen.flow_from_directory(
           batch_size = BATCH_SIZE,
           class_mode = CLASS_MODE)
   
-# Display an image as example
-img_sample = next(train_generator)[0][0]
-plt.imshow(img_sample)
-
 # Define model
 model = ks.models.Sequential((
         
         ks.layers.Conv2D(
-                #input_shape=(64, 64, 3),
+                input_shape=(64, 64, 3),
                 filters = 32, 
                 kernel_size = 3, 
                 strides = 1,
@@ -79,9 +75,13 @@ model.compile(
 model.fit_generator(
           train_generator,
           steps_per_epoch = 8000,
-          epochs = 10,
+          epochs = 1,
           validation_data = validation_generator,
           validation_steps = 2000)
+
+# Display an image as example
+img_sample = next(train_generator)[0][0]
+plt.imshow(img_sample)
 
 # Make a prediction
 img_samples = np.expand_dims(img_sample, axis = 0)
