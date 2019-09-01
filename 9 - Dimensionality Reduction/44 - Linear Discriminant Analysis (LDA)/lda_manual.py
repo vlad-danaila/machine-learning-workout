@@ -15,19 +15,22 @@ x, y = data.iloc[:, :-1].values, data.iloc[:, -1].values
 label_encoder = sk.preprocessing.LabelEncoder()
 y = label_encoder.fit_transform(y)
 
-# Means 
-mean_vectors = [np.mean(x[y == i], axis=0) for i in range(3)] # 3 x 4 matrix(class x features)
-mean_features = x.mean(axis = 0) # 4
-mean_diff = mean_vectors - mean_features # 3 x 4 minus 4
-
+# Separate x per classes
+x_class = [x[y == i] for i in range(3)]
+    
 # Init scatter matrices
 within_class_scatter = np.zeros((4,4))
 between_class_scatter = np.zeros((4, 4))
-
-for i in range(3):  
-    # Compute within class scatter matrix
-    x_class_i = x[y == i]
-    diff = x_class_i - mean_vectors[i] # N x 4 minus 4, broadcasts difference to N
-    within_class_scatter += diff.T.dot(diff) # 4 x N dot N x 4 gives 4 x 4 
-    # Compute between class scatter matrix
-    between_class_scatter += len(x_class_i) * mean_diff[i].reshape(4, 1).dot(mean_diff[i].reshape(1, 4))    
+    
+# Mean of features for all classes
+mean_all = x.mean(axis = 0) # 4
+for x_cls in x_class:
+    # Mean of features per class
+    mean_cls = np.mean(x_cls, axis=0) # 4 
+    mean_diff = mean_cls - mean_all # 4 - 4 = 4
+    mean_diff = mean_diff.reshape(4, 1) # Make a column vector
+    diff = x_cls - mean_cls # N x 4 - 4 = N x 4
+    within_class_scatter += diff.T.dot(diff) # 4 x N dot N x 4 = 4 x 4
+    between_class_scatter += len(x_cls) * mean_diff.dot(mean_diff.T)
+    
+    
