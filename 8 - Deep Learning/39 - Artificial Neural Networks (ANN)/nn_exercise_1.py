@@ -16,8 +16,8 @@ x, y = data.iloc[:, 3:-1].values, data.iloc[:, -1].values
 
 # Categorical columns
 CATEGORICAL_COLUMNS = [1, 2]
-one_hot_encoder = sk.preprocessing.OneHotEncoder()
-categories = one_hot_encoder.fit_transform(x[:, CATEGORICAL_COLUMNS]).toarray()
+one_hot_encoder = sk.preprocessing.OneHotEncoder(sparse = False)
+categories = one_hot_encoder.fit_transform(x[:, CATEGORICAL_COLUMNS])
 categories = np.delete(categories, [0, 2], axis = 1)
 x = np.delete(x, CATEGORICAL_COLUMNS, axis = 1)
 x = x.astype(np.float32)
@@ -30,7 +30,7 @@ x_train, x_test, y_train, y_test = sk.model_selection.train_test_split(x, y, tra
 SCALED_COLUMNS = [0, 1, 2, 3, 4, 7]
 scaler = sk.preprocessing.StandardScaler()
 x_train[:, SCALED_COLUMNS] = scaler.fit_transform(x_train[:, SCALED_COLUMNS])
-x_test[:, SCALED_COLUMNS] = scaler.fit_transform(x_test[:, SCALED_COLUMNS])
+x_test[:, SCALED_COLUMNS] = scaler.transform(x_test[:, SCALED_COLUMNS])
 
 # Define model
 FEATURE_LEN = len(x_train[0])
