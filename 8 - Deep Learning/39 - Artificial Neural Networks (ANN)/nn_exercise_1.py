@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import sklearn.preprocessing.label
 import sklearn.model_selection
+import sklearn.metrics
 
 data = pd.read_csv('C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 8 - Deep Learning/Section 39 - Artificial Neural Networks (ANN)/Churn_Modelling.csv')
 x, y = data.iloc[:, 3:-1].values, data.iloc[:, -1].values 
@@ -41,5 +42,12 @@ model = k.models.Sequential([
 model.compile(k.optimizers.Adam(), k.losses.binary_crossentropy, metrics=[k.metrics.binary_accuracy])
 
 # Training
-model.fit(x_train, y_train, batch_size = 32, epochs = 3, validation_data = (x_test, y_test), shuffle = True)
+model.fit(x_train, y_train, batch_size = 32, epochs = 10, validation_data = (x_test, y_test), shuffle = True)
+
+# Make predictions
 y_pred = model.predict(x_test)
+y_pred = y_pred > 0.5
+
+cm = sk.metrics.confusion_matrix(y_test, y_pred)
+accuracy = np.sum(np.diag(cm)) / np.sum(cm)
+print('Accuracy is', accuracy)
