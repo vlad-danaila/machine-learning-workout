@@ -40,3 +40,6 @@ model = k.models.Sequential([
 ])
 model.compile(k.optimizers.Adam(), k.losses.binary_crossentropy, metrics=[k.metrics.binary_accuracy])
 
+# Training
+model.fit(x_train, y_train, batch_size = 32, epochs = 3, validation_data = (x_test, y_test), shuffle = True)
+y_pred = model.predict(x_test)
