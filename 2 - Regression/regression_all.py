@@ -48,12 +48,24 @@ x_min, x_max = min(x_train_pca), max(x_train_pca)
 padd = (x_max - x_min) / 5
 x_granular = np.linspace(x_min - padd, x_max + padd, 10000)
 
+# Only for SVR
+scaler_y = sk.preprocessing.StandardScaler()
+scaler_y.fit(np.expand_dims(y_train, 1))
+
 for name, model in models.items():
-    model.fit(x_train, y_train)
+    
+    model.fit(x_train, y_train if not name == 'SVR' 
+              else scaler_y.transform(np.expand_dims(y_train, 1)).ravel())
     y_pred = model.predict(x_test)
     error = sk.metrics.mean_absolute_error(y_test, y_pred)
     y_granular = model.predict(pca.inverse_transform(x_granular))
+    
+    if name == 'SVR':
+        y_granular = scaler_y.inverse_transform(np.expand_dims(y_granular, 1)).ravel()
+        y_pred = scaler_y.inverse_transform(np.expand_dims(y_pred, 1)).ravel()
+    
     plt.plot(x_granular, y_granular)
     plt.scatter(x_train_pca, y_train)
+    plt.scatter(x_test_pca, y_test)
     plt.title('{} (error {})'.format(name, error))
     plt.show()
