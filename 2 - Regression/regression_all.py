@@ -39,10 +39,6 @@ models['decision tree'] = sk.tree.DecisionTreeRegressor()
 models['random forest'] = sk.ensemble.RandomForestRegressor()
 models['SVR'] = sk.svm.SVR()
 
-model = sk.linear_model.LinearRegression()
-model.fit(x_train, y_train)
-y_pred = model.predict(x_test)
-
 # PCA only for visualization
 pca = sk.decomposition.PCA(1)
 x_train_pca = pca.fit_transform(x_train)
@@ -51,9 +47,13 @@ x_test_pca = pca.transform(x_test)
 x_min, x_max = min(x_train_pca), max(x_train_pca)
 padd = (x_max - x_min) / 5
 x_granular = np.linspace(x_min - padd, x_max + padd, 10000)
-y_granular = model.predict(pca.inverse_transform(x_granular))
-error = sk.metrics.mean_absolute_error(y_test, y_pred)
 
-plt.plot(x_granular, y_granular)
-plt.scatter(x_train_pca, y_train)
-plt.title('{} (error {})'.format('linear', error))
+for name, model in models.items():
+    model.fit(x_train, y_train)
+    y_pred = model.predict(x_test)
+    error = sk.metrics.mean_absolute_error(y_test, y_pred)
+    y_granular = model.predict(pca.inverse_transform(x_granular))
+    plt.plot(x_granular, y_granular)
+    plt.scatter(x_train_pca, y_train)
+    plt.title('{} (error {})'.format(name, error))
+    plt.show()
