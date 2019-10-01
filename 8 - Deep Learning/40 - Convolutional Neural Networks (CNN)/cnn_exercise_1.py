@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import numpy as np
 import sklearn as sk
 import sklearn.preprocessing
@@ -10,7 +8,7 @@ import keras.preprocessing.image
 
 # Data load
 
-DATASET_PATH = 'C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 8 - Deep Learning/Section 40 - Convolutional Neural Networks (CNN)/dataset/'
+DATASET_PATH = '/content/drive/My Drive/dataset/'
 IMG_SIZE = 64, 64
 BATCH_SIZE = 64
 
@@ -60,9 +58,12 @@ model = k.models.Sequential((
         k.layers.Conv2D(32, 3, padding='same', activation='relu'),
         k.layers.MaxPool2D(),
         k.layers.Flatten(),
-        k.layers.Dense(1)
+        k.layers.Dense(128, activation='relu'),
+        k.layers.Dense(1, activation=k.activations.sigmoid)
 ))
 
 model.compile(k.optimizers.Adam(), k.losses.binary_crossentropy, [k.metrics.binary_accuracy])
 
-model.fit_generator(data_train, steps_per_epoch = 1000, epochs = 10, validation_data = data_test, validation_steps = 200)
+# Train
+
+model.fit_generator(data_train, steps_per_epoch = 800, epochs = 10, validation_data = data_test, validation_steps = 200)
