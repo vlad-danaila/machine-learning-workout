@@ -30,10 +30,11 @@ def cluster_data(nb_clusters, cluster_model, model_name):
         total_variance += cluster_variance(cluster)
         plt.scatter(cluster[:, 0], cluster[:, 1], color = get_color(i))
     plt.title('{} ({} clusters, {} variance)'.format(model_name, nb_clusters, total_variance))
-    plt.show()
+    #plt.show()
 
 for nb_clusters in range(1, 11):
-    cluster_data(nb_clusters, sk.cluster.AgglomerativeClustering, 'Hierarchical')
+    fig = plt.figure(figsize = (15, 5))
+    fig.add_subplot(1, 2, 1)
     cluster_data(nb_clusters, sk.cluster.KMeans, 'KMeans')
-        
-
+    fig.add_subplot(1, 2, 2)
+    cluster_data(nb_clusters, sk.cluster.AgglomerativeClustering, 'Hierarchical')
