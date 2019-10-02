@@ -34,7 +34,7 @@ def cluster_data(nb_clusters, cluster_model, model_name):
 
 variances_k, variances_h = [], [] 
 
-for nb_clusters in range(1, 11):
+for nb_clusters in range(2, 11):
     fig = plt.figure(figsize = (15, 5))
     fig.add_subplot(1, 2, 1)
     variance_k = cluster_data(nb_clusters, sk.cluster.KMeans, 'KMeans')
@@ -43,12 +43,24 @@ for nb_clusters in range(1, 11):
     variance_h = cluster_data(nb_clusters, sk.cluster.AgglomerativeClustering, 'Hierarchical')
     variances_h.append(variance_h)
     
+def find_boldest_angle(v):
+    #torsion = np.abs(np.gradient(np.gradient(np.gradient(v))))
+    #return np.argmax(torsion) + 1clear
+    slope = np.gradient(v, 1)
+    curvature = np.gradient(slope, 1, edge_order = 2)
+    torsion = np.gradient(curvature, 1, edge_order = 2)
+    torsion_abs = np.abs(torsion)
+    return np.argmax(torsion_abs) + 2
+
+    
 fig = plt.figure(figsize = (15, 5))
 
 fig.add_subplot(1, 2, 1)
-plt.plot(range(len(variances_k)), variances_k)
+plt.plot(range(2, len(variances_k) + 2), variances_k)
 plt.title('Variance KMeans')
 
 fig.add_subplot(1, 2, 2)
-plt.plot(range(len(variances_h)), variances_h)
+plt.plot(range(2, len(variances_h) + 2), variances_h)
+best_nb_clusters = find_boldest_angle(variances_h)
+plt.scatter(best_nb_clusters, variances_h[best_nb_clusters - 2], color = 'red', s = 100)
 plt.title('Variance Hierarchical')

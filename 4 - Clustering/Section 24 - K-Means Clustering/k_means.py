@@ -34,7 +34,7 @@ slope = np.gradient(wcss)
 curvature = np.gradient(slope)
 torsion = np.gradient(curvature)
 torsion_abs = np.abs(torsion)
-nr_clusters = np.where(torsion_abs == torsion_abs.max())[0][0] + 2
+nr_clusters = np.argmax(torsion_abs) + 2
 print('The best number of clusters is', nr_clusters)
 subplots[0].scatter(nr_clusters, wcss[nr_clusters - 2], color = 'red', s = 100)
 
@@ -57,5 +57,3 @@ subplots[1].set_title('Clusters')
 subplots[1].set_xlabel('Inconme')
 subplots[1].set_ylabel('Spending Score')
 plt.show()
-
-
