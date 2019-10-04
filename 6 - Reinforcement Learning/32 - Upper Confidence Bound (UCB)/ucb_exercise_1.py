@@ -25,7 +25,7 @@ class ConfidenceBound:
     def lower_bound(self, step):
         return self.center() - self.bound(step)
             
-    def update(self, step, reward):
+    def update(self, reward):
         self.nb_selections += 1
         self.total_reward += reward
         
@@ -49,7 +49,7 @@ bounds = [ConfidenceBound() for i in range(10)]
 
 for i in range(len(x)):
     selected_action = np.array([b.upper_bound(i) for b in bounds]).argmax()
-    bounds[selected_action].update(step = i, reward = x[i][selected_action])
+    bounds[selected_action].update(x[i][selected_action])
     if i != 0 and i % 1000 == 0:
         plot_bounds(bounds, i)
         
