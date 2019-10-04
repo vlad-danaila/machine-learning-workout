@@ -10,30 +10,32 @@ x = data.values.astype(np.byte)
 
 class ConfidenceBound:
     def __init__(self):
-        self.center = 0
-        self.bound = 100
-        self.nb_selections = 0
-        self.total_reward = 0
-        
-    def upper_bound(self):
-        return self.center + self.bound
+        self.nb_selections = 1e-10
+        self.total_reward = 1e-10
+    
+    def center(self):
+        return self.total_reward / self.nb_selections
+    
+    def bound(self, step):
+        return math.sqrt(3/2 * math.log(step + 1) / self.nb_selections)
+    
+    def upper_bound(self, step):
+        return self.center() + self.bound(step)
 
-    def lower_bound(self):
-        return self.center - self.bound
+    def lower_bound(self, step):
+        return self.center() - self.bound(step)
             
     def update(self, step, reward):
         self.nb_selections += 1
         self.total_reward += reward
-        self.center = self.total_reward / self.nb_selections
-        self.bound = math.sqrt(3/2 * math.log(step + 1) / self.nb_selections)
         
-def plot_bounds(bounds):
-    low = [b.lower_bound() for b in bounds]
-    segments = [b.upper_bound() - b.lower_bound() for b in bounds]
-    centers = [b.center for b in bounds]
+def plot_bounds(bounds, step):
+    low = [b.lower_bound(step) for b in bounds]
+    segments = [b.upper_bound(step) - b.lower_bound(step) for b in bounds]
+    centers = [b.center() for b in bounds]
     plt.bar(range(1, 11), height = segments, bottom = low)
     plt.bar(range(1, 11), height = .01, bottom = centers, color = 'red')
-    plt.title('UCB confidence bounds')
+    plt.title('UCB confidence bounds - step {}'.format(step))
     plt.show()
 
 def plt_nb_selections(bounds):
@@ -46,10 +48,9 @@ def plt_nb_selections(bounds):
 bounds = [ConfidenceBound() for i in range(10)]
 
 for i in range(len(x)):
-    selected_action = np.array([b.upper_bound() for b in bounds]).argmax()
+    selected_action = np.array([b.upper_bound(i) for b in bounds]).argmax()
     bounds[selected_action].update(step = i, reward = x[i][selected_action])
-    if i % 1000 == 0:
-        print(i)
-        plot_bounds(bounds)
+    if i != 0 and i % 1000 == 0:
+        plot_bounds(bounds, i)
         
 plt_nb_selections(bounds)
