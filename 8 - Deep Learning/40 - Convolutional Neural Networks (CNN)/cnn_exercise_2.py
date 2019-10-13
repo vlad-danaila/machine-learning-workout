@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 dataset_root_dir = 'C:/DOC/Workspace/Machine Learning A-Z Template Folder/Part 8 - Deep Learning/Section 40 - Convolutional Neural Networks (CNN)/dataset/'
 dataset_classes_folders = ['cats', 'dogs']
 img_size = 64, 64
-batch_size = 16
+batch_size = 64
 
 data_gen_train = ks.preprocessing.image.ImageDataGenerator(
     rotation_range = 20,
@@ -61,13 +61,18 @@ model = ks.Sequential([
         
     ks.layers.BatchNormalization(),    
     ks.layers.Dropout(.3),
-    ks.layers.Conv2D(filters = 32, kernel_size = 3, padding = 'same', activation = relu), 
+    ks.layers.Conv2D(filters = 64, kernel_size = 3, padding = 'same', activation = relu), 
     ks.layers.MaxPool2D(), # size 16
+    
+    ks.layers.BatchNormalization(),    
+    ks.layers.Dropout(.3),
+    ks.layers.Conv2D(filters = 32, kernel_size = 3, padding = 'same', activation = relu), 
+    ks.layers.MaxPool2D(), # size 8
         
     ks.layers.BatchNormalization(),    
     ks.layers.Dropout(.3),
     ks.layers.Conv2D(filters = 10, kernel_size = 3, padding = 'same', activation = relu), 
-    ks.layers.MaxPool2D(), # size 8
+    ks.layers.MaxPool2D(), # size 4
     
     ks.layers.BatchNormalization(),    
     ks.layers.Flatten(),
@@ -85,5 +90,6 @@ metrics = [ks.metrics.BinaryAccuracy()]
 model.compile(optimizer, loss, metrics)
 
 history = model.fit_generator(
-        generaotr_train, 1000, 10, validation_data = generaotr_test, validation_steps = 125)
+        generaotr_train, 1000, 20, validation_data = generaotr_test, validation_steps = 32)
+
 
