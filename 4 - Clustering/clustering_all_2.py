@@ -14,14 +14,21 @@ x = data.values[:, [3, 4]].astype(np.float32)
 
 def cluster_k_means(n_clusters):
     centroids, labels, inertia = sk.cluster.k_means(x, n_clusters = n_clusters)
-    plot_cluster(n_clusters, labels, centroids)
+    plot_cluster(n_clusters, labels, centroids, 'Kmeans')
     return inertia
-    
-def plot_cluster(n_clusters, labels, centroids):
+
+def cluster_hierarchical(n_clusters):
+    hierarchical = sk.cluster.hierarchical.AgglomerativeClustering(n_clusters)
+    labels = hierarchical.fit_predict(x)
+    centroids = np.array([ np.mean(x[labels == i], axis = 0) for i in range(n_clusters) ])
+    plot_cluster(n_clusters, labels, centroids, 'Hierarchical')
+        
+def plot_cluster(n_clusters, labels, centroids, title):
+    print(centroids)
     for cluster_class in range(n_clusters):
         plt.scatter(x[labels == cluster_class, 0], x[labels == cluster_class, 1])
         plt.scatter(centroids[cluster_class, 0], centroids[cluster_class, 1], color = 'black', s = 200)
-        plt.title('K-Means')
+        plt.title(title)
     plt.show()
     
 cluster_spread = []    
@@ -29,6 +36,9 @@ angles = []
 
 for n_clusters in range(1, 11):
     cluster_spread.append(cluster_k_means(n_clusters))
+    
+for n_clusters in range(1, 11):
+    cluster_hierarchical(n_clusters)
 
 def to_angle(v):
     return cmath.phase(v) / cmath.pi * 180
