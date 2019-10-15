@@ -16,7 +16,7 @@ rewards = np.ones(10), np.ones(10)
 selected = []
 
 for i in range(len(ads)):
-    beta = np.random.beta(rewards[0], rewards[1], 10)
+    beta = np.random.beta(rewards[1], rewards[0], 10)
     action = np.argmax(beta)    
     reward = ads[i][action]
     rewards[reward][action] += 1
